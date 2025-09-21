@@ -1,0 +1,97 @@
+# snake_water_gun.py
+# Simple Snake-Water-Gun game: player vs computer
+
+import random
+import sys
+import time
+
+CHOICES = {
+    "s": "Snake",
+    "w": "Water",
+    "g": "Gun"
+}
+
+WIN_RULES = {
+    # winner: defeats
+    "s": "w",  # Snake drinks water -> snake beats water
+    "w": "g",  # Water rusts gun -> water beats gun
+    "g": "s",  # Gun kills snake -> gun beats snake
+}
+
+def get_computer_choice():
+    return random.choice(list(CHOICES.keys()))
+
+def decide_winner(player, computer):
+    if player == computer:
+        return "tie"
+    if WIN_RULES[player] == computer:
+        return "player"
+    else:
+        return "computer"
+
+def pretty_choice(key):
+    return CHOICES.get(key, "Unknown")
+
+def prompt_player_choice():
+    prompt = "Choose (s)nake, (w)ater, (g)un or (q)uit: "
+    while True:
+        user = input(prompt).strip().lower()
+        if user in ("s", "w", "g", "q"):
+            return user
+        # allow full words
+        if user in ("snake", "water", "gun", "quit", "exit"):
+            abbrev = user[0]
+            if abbrev == "e":  # 'exit' -> 'e' not valid
+                abbrev = "q"
+            return abbrev
+        print("Invalid input. Type s, w, g, or q (or 'snake', 'water', 'gun').")
+
+def main():
+    print("=== Snake, Water, Gun ===")
+    print("Rules: Snake beats Water, Water beats Gun, Gun beats Snake.")
+    rounds = 0
+    score = {"player": 0, "computer": 0, "tie": 0}
+
+    try:
+        while True:
+            player = prompt_player_choice()
+            if player == "q":
+                break
+
+            computer = get_computer_choice()
+            result = decide_winner(player, computer)
+
+            rounds += 1
+            score[result] += 1
+
+            print(f"\nYou chose:     {pretty_choice(player)}")
+            print(f"Computer chose:{pretty_choice(computer)}")
+
+            if result == "tie":
+                print("Result: It's a tie!")
+            elif result == "player":
+                print("Result: You win this round! 🎉")
+            else:
+                print("Result: Computer wins this round. 😅")
+
+            print(f"Score -> You: {score['player']}  Computer: {score['computer']}  Ties: {score['tie']}")
+            print("-" * 36)
+
+    except (KeyboardInterrupt, EOFError):
+        print("\n\nGame interrupted.")
+
+    print("\nFinal results:")
+    print(f"Total rounds played: {rounds}")
+    print(f"You won:     {score['player']}")
+    print(f"Computer won:{score['computer']}")
+    print(f"Ties:        {score['tie']}")
+
+    if score["player"] > score["computer"]:
+        print("Overall: You are the champion! 🏆")
+    elif score["player"] < score["computer"]:
+        print("Overall: Computer wins. Better luck next time!")
+    else:
+        print("Overall: It's a draw!")
+
+if __name__ == "__main__":
+    main()
